@@ -15,26 +15,48 @@ from sqlalchemy.engine import URL
 ROOT = Path(__file__).resolve().parent.parent
 
 
+_REQUIRED = ("host", "port", "user", "password", "database")
+
+
+def _read_settings():
+    """Return (settings dict, problem text). Accepts a [mysql] table OR top-level keys."""
+    try:
+        sec = st.secrets
+        if "mysql" in sec:
+            block = sec["mysql"]
+        elif all(k in sec for k in _REQUIRED):      # pasted without the [mysql] header
+            block = sec
+        else:
+            found = list(sec.keys())
+            return None, ("No [mysql] section found in the app's secrets. "
+                          f"Keys found: {found if found else 'none'}. "
+                          "The first line of the secrets must be exactly: [mysql]")
+        missing = [k for k in _REQUIRED if k not in block]
+        if missing:
+            return None, f"The secrets are missing these keys: {missing}"
+        return {k: block[k] for k in _REQUIRED} | {"ssl_ca": block.get("ssl_ca", "certs/ca.pem")}, ""
+    except Exception as exc:  # noqa: BLE001 - e.g. no secrets file at all
+        return None, f"Secrets could not be read ({type(exc).__name__})."
+
+
 @st.cache_resource
 def get_engine():
     """One pooled engine for the whole app (SSL for Aiven)."""
-    secrets = None
-    try:
-        secrets = st.secrets["mysql"]
-    except Exception:
-        secrets = None
-    if secrets is not None:
-        ca = Path(secrets.get("ssl_ca", ROOT / "certs" / "aiven-ca.pem"))
+    cfg, problem = _read_settings()
+    if cfg is not None:
+        ca = Path(cfg["ssl_ca"])
         if not ca.is_absolute():
             ca = ROOT / ca
-        url = URL.create("mysql+pymysql", username=secrets["user"], password=secrets["password"],
-                         host=secrets["host"], port=int(secrets["port"]), database=secrets["database"])
-        connect_args = {"ssl": {"ca": str(ca)}} if ca.exists() else {}
-        return create_engine(url, connect_args=connect_args, pool_pre_ping=True, pool_recycle=280)
+        if not ca.exists():
+            st.error(f"CA certificate not found at '{cfg['ssl_ca']}'. Make sure certs/ca.pem is in the "
+                     "GitHub repository and that ssl_ca in the secrets points to it.")
+            st.stop()
+        url = URL.create("mysql+pymysql", username=str(cfg["user"]), password=str(cfg["password"]),
+                         host=str(cfg["host"]), port=int(cfg["port"]), database=str(cfg["database"]))
+        return create_engine(url, connect_args={"ssl": {"ca": str(ca)}}, pool_pre_ping=True, pool_recycle=280)
     if os.environ.get("DATABASE_URL"):
         return create_engine(os.environ["DATABASE_URL"])
-    st.error("No database configured. Add a [mysql] block to .streamlit/secrets.toml "
-             "(see secrets.toml.example).")
+    st.error(f"No database configured. {problem}")
     st.stop()
 
 
