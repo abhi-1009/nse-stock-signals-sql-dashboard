@@ -1,0 +1,13 @@
+stock,column,missing_rows,missing_pct,handling,why
+Bajaj Auto,Deliverable Quantity,1,0.11,Kept as NULL (row retained),Column not used in any calculation; likely exchange reporting gap
+Bajaj Auto,% Deli. Qty to Traded Qty,1,0.11,Kept as NULL (row retained),Column not used in any calculation; likely exchange reporting gap
+Eicher Motors,Deliverable Quantity,1,0.11,Kept as NULL (row retained),Column not used in any calculation; likely exchange reporting gap
+Eicher Motors,% Deli. Qty to Traded Qty,1,0.11,Kept as NULL (row retained),Column not used in any calculation; likely exchange reporting gap
+Hero Motocorp,Deliverable Quantity,1,0.11,Kept as NULL (row retained),Column not used in any calculation; likely exchange reporting gap
+Hero Motocorp,% Deli. Qty to Traded Qty,1,0.11,Kept as NULL (row retained),Column not used in any calculation; likely exchange reporting gap
+Infosys,Deliverable Quantity,1,0.11,Kept as NULL (row retained),Column not used in any calculation; likely exchange reporting gap
+Infosys,% Deli. Qty to Traded Qty,1,0.11,Kept as NULL (row retained),Column not used in any calculation; likely exchange reporting gap
+TCS,Deliverable Quantity,1,0.11,Kept as NULL (row retained),Column not used in any calculation; likely exchange reporting gap
+TCS,% Deli. Qty to Traded Qty,1,0.11,Kept as NULL (row retained),Column not used in any calculation; likely exchange reporting gap
+TVS Motors,Deliverable Quantity,1,0.11,Kept as NULL (row retained),Column not used in any calculation; likely exchange reporting gap
+TVS Motors,% Deli. Qty to Traded Qty,1,0.11,Kept as NULL (row retained),Column not used in any calculation; likely exchange reporting gap
