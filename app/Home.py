@@ -40,14 +40,16 @@ buys, sells = int(summary["buys_adj"].sum()), int(summary["sells_adj"].sum())
 best = summary.sort_values("pct_change_adj", ascending=False).iloc[0]
 worst = summary.sort_values("pct_change_adj").iloc[0]
 k1, k2, k3, k4 = st.columns(4)
-k1.metric("Stocks analysed", summary.shape[0], help="Bajaj, Eicher, Hero, Infosys, TCS, TVS")
-k2.metric("Trading days each", f"{n_days:,}", help="2015-01-01 to 2018-07-31")
-k3.metric("Buy / Sell signals (adjusted)", f"{buys} / {sells}",
-          help="Adjusted for bonus issues. On raw prices the brief's total is 56 / 57.")
-k4.metric("Price events fixed", len(events), help="Bonus issues that halved the quoted price")
+k1.metric("Stocks", summary.shape[0], help="Bajaj, Eicher, Hero, Infosys, TCS, TVS")
+k2.metric("Trading days", f"{n_days:,}", help="2015-01-01 to 2018-07-31")
+k3.metric("Buy / Sell (adj.)", f"{buys} / {sells}",
+          help="Signals on prices adjusted for bonus issues. On raw prices the brief's total is 56 / 57.")
+k4.metric("Events fixed", len(events), help="Bonus issues that halved the quoted price")
 k5, k6 = st.columns(2)
-k5.metric(f"Best performer (adjusted): {best['stock']}", theme.pct(best["pct_change_adj"]))
-k6.metric(f"Weakest performer (adjusted): {worst['stock']}", theme.pct(worst["pct_change_adj"]))
+k5.metric(f"Best: {best['stock']}", theme.pct(best["pct_change_adj"]),
+          help="Best performer, first to last day, adjusted prices")
+k6.metric(f"Weakest: {worst['stock']}", theme.pct(worst["pct_change_adj"]),
+          help="Weakest performer, first to last day, adjusted prices")
 
 # ---- rebased chart ----
 piv = prices.pivot(index="date", columns="stock", values="adj_close")

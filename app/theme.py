@@ -56,8 +56,9 @@ def how_to_read(text: str):
 def style_fig(fig, title: str = "", ytitle: str = "", xtitle: str = "", height: int = 460):
     fig.update_layout(
         title=dict(text=title, x=0, font=dict(size=17)),
-        height=height, margin=dict(l=10, r=10, t=60, b=10),
-        legend=dict(orientation="h", yanchor="bottom", y=1.0, xanchor="right", x=1),
+        height=height, margin=dict(l=10, r=10, t=100, b=10),
+        title_y=0.96, title_yanchor="top",
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="left", x=0, font=dict(size=12)),
         hovermode="x unified", plot_bgcolor="white", paper_bgcolor="white",
         font=dict(family="sans-serif", size=13, color="#1f2937"),
     )
