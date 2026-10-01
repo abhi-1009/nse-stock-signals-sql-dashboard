@@ -14,6 +14,7 @@
 **[🚀 Open the live dashboard](https://nse-stock-signals-sql-dashboard-jkxkfdhnxtbrswkl6beakt.streamlit.app)**
 
 Live app: https://nse-stock-signals-sql-dashboard-jkxkfdhnxtbrswkl6beakt.streamlit.app
+
 **Insights report:** [Insights_Report.pdf](insights/Insights_Report.pdf)
 
 </div>
