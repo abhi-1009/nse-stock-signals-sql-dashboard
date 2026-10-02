@@ -81,3 +81,30 @@ if mv.exists():
                "calculation, so the rows were kept and the columns left as NULL.")
 else:
     st.info("Run scripts/audit_data.py to generate insights/missing_values.csv.")
+
+# ---------- Acknowledgement and thank-you ----------
+st.divider()
+st.subheader("Acknowledgement")
+st.markdown(
+    "I thank **Labmentix** for the project brief, the student guide and the dataset, and my mentors and "
+    "instructors for their guidance and feedback. Thanks also to the **National Stock Exchange of India** "
+    "(public corporate-action circular) and **Business Standard / PTI**, whose published reports confirmed the "
+    "bonus-issue dates; to **Aiven** (cloud MySQL) and **Streamlit** (app hosting); and to the open-source tools "
+    "behind this work - MySQL, Python, pandas, SQLAlchemy, Plotly and Matplotlib.")
+
+st.markdown(
+    """
+    <div style="background:#1e3a8a;border-radius:14px;padding:26px 20px;text-align:center;margin:18px 0 8px 0;">
+      <div style="color:#ffffff;font-size:2rem;font-weight:750;">Thank you</div>
+      <div style="color:#dbeafe;font-size:1rem;margin-top:6px;">
+        Thank you for exploring this dashboard. I welcome your feedback and questions.
+      </div>
+      <div style="color:#93c5fd;font-size:0.85rem;margin-top:12px;">
+        Code: github.com/abhi-1009/nse-stock-signals-sql-dashboard
+      </div>
+      <div style="color:#93c5fd;font-size:0.8rem;margin-top:4px;">
+        Learning project - not investment advice.
+      </div>
+    </div>
+    """,
+    unsafe_allow_html=True)
