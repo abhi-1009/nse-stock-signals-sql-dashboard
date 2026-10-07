@@ -77,10 +77,9 @@ else:
     fake = int((m["Status"] != "Same on both").sum())
     changed = m[m["Status"] != "Same on both"].copy()
     changed["date"] = changed["date"].dt.strftime("%Y-%m-%d")
-    k1, k2, k3 = st.columns(3)
-    k1.metric("Signals on raw prices", len(r))
-    k2.metric("Signals on adjusted prices", len(a))
-    k3.metric("Signals that differ", fake)
+    theme.kpi_row([("Signals on raw prices", len(r), "as quoted", "📉", "#dc2626"),
+                   ("Signals on adjusted prices", len(a), "after the bonus fix", "📈", "#16a34a"),
+                   ("Signals that differ", fake, "created or hidden by the cliff", "⚠️", "#f59e0b")])
     if fake:
         st.dataframe(changed.rename(columns={"date": "Date"}).fillna("-"), hide_index=True, width="stretch")
     theme.takeaway(f"{fake} of {stock}'s signals change depending on whether the bonus issue is adjusted: the "

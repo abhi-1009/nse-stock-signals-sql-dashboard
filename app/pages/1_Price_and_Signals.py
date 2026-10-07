@@ -6,18 +6,17 @@ import db
 import theme
 
 theme.setup("Price & Signals", "📊")
-theme.header("Price & Signals", "Close price, 20- and 50-day averages, and the golden-cross Buy/Sell days")
-theme.how_to_read(
-    "- **Grey line** = daily closing price. **Amber** = 20-day average, **blue** = 50-day average.\n"
-    "- **▲ Buy** is the single day the 20-day average crosses *above* the 50-day; **▼ Sell** the day it crosses *below*.\n"
-    "- Averages only exist after 20 / 50 trading days, so early 2015 has none.\n"
-    "- *Adjusted* prices remove the fake ~50% drop caused by bonus issues at TCS and Infosys.")
-
 with st.sidebar:
     stock = st.selectbox("Stock", theme.STOCKS, index=0)
     basis = st.radio("Price basis", ["Adjusted (recommended)", "Raw"], index=0)
     show_ma = st.checkbox("Show moving averages", value=True)
 
+theme.header(stock, "Close price, 20- and 50-day averages, and the golden-cross Buy/Sell days", stock=stock)
+theme.how_to_read(
+    "- **Grey line** = daily closing price. **Amber** = 20-day average, **blue** = 50-day average.\n"
+    "- **▲ Buy** is the single day the 20-day average crosses *above* the 50-day; **▼ Sell** the day it crosses *below*.\n"
+    "- Averages only exist after 20 / 50 trading days, so early 2015 has none.\n"
+    "- *Adjusted* prices remove the fake ~50% drop caused by bonus issues at TCS and Infosys.")
 df = db.load_signals(stock, adjusted=basis.startswith("Adjusted"))
 if df.empty:
     st.warning("No data returned.")
@@ -34,16 +33,13 @@ if df.empty:
 sig = df[df["signal"] != "Hold"]
 buys, sells = int((sig["signal"] == "Buy").sum()), int((sig["signal"] == "Sell").sum())
 chg = (df["price"].iloc[-1] / df["price"].iloc[0] - 1) * 100
-m1, m2, m3, m4 = st.columns(4)
-m1.metric("Change in range", theme.pct(chg))
-m2.metric("Buy signals", buys)
-m3.metric("Sell signals", sells)
-if len(sig):
-    last = sig.iloc[-1]
-    m4.metric("Latest signal", f"{last['signal']}", pd.Timestamp(last["date"]).strftime("%d %b %Y"),
-              delta_color="off")
-else:
-    m4.metric("Latest signal", "None")
+last = sig.iloc[-1] if len(sig) else None
+theme.kpi_row([
+    ("Change in range", theme.pct(chg), "first to last day shown", "📈", theme.GOOD if chg >= 0 else theme.BAD),
+    ("Buy signals", buys, "20-day crosses above 50-day", "🟢", theme.BUY),
+    ("Sell signals", sells, "20-day crosses below 50-day", "🔴", theme.SELL),
+    ("Latest signal", last["signal"] if last is not None else "None",
+     pd.Timestamp(last["date"]).strftime("%d %b %Y") if last is not None else "", "🔔", "#8b5cf6")])
 
 fig = go.Figure()
 fig.add_trace(go.Scatter(x=df["date"], y=df["price"], name="Close price",

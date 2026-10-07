@@ -1,4 +1,8 @@
 """Shared look-and-feel: colours, page setup, chart styling, text helpers."""
+import base64
+from functools import lru_cache
+from pathlib import Path
+
 import streamlit as st
 
 STOCKS = ["Bajaj Auto", "Eicher Motors", "Hero Motocorp", "Infosys", "TCS", "TVS Motors"]
@@ -13,19 +17,95 @@ GOOD, BAD, NEUTRAL = "#16a34a", "#dc2626", "#6b7280"
 
 _CSS = """
 <style>
-.block-container {padding-top: 1.4rem; padding-bottom: 2rem; max-width: 1250px;}
-h1 {font-weight: 750; letter-spacing: -0.5px;}
-div[data-testid="stMetric"] {background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px;
-  padding:14px 18px; box-shadow:0 1px 2px rgba(0,0,0,.04);}
-div[data-testid="stMetricLabel"] p {font-size:0.85rem; color:#6b7280;}
-.takeaway {background:#eff6ff; border-left:4px solid #2563eb; padding:8px 14px; border-radius:6px;
-  color:#1e3a8a; font-size:0.93rem; margin:4px 0 18px 0;}
-.subtitle {color:#6b7280; font-size:1.05rem; margin-top:-8px; margin-bottom:14px;}
-.pill {display:inline-block; padding:2px 10px; border-radius:999px; font-size:0.8rem; font-weight:600;}
+.stApp {background: linear-gradient(180deg,#e8f0ff 0%,#f6f9ff 280px,#ffffff 100%);}
+.block-container {padding-top: 1.2rem; padding-bottom: 2rem; max-width: 1250px;}
+[data-testid="stHeader"] {background: transparent;}
+h1,h2,h3 {color:#0f2a5c; letter-spacing:-0.4px;} h1 {font-weight:800;}
+/* sidebar */
+[data-testid="stSidebar"] {background: linear-gradient(180deg,#0f2a5c 0%,#1e3a8a 100%);}
+[data-testid="stSidebar"] [data-testid="stSidebarNav"] a span, [data-testid="stSidebar"] label p,
+[data-testid="stSidebar"] .stMarkdown p, [data-testid="stSidebar"] h3, [data-testid="stSidebar"] .stCaption p {color:#e0e7ff !important;}
+[data-testid="stSidebar"] [data-testid="stSidebarNav"] a[aria-current="page"] {background:rgba(255,255,255,.16); border-radius:10px;}
+/* hero */
+.hero {background: linear-gradient(120deg,#0f2a5c 0%,#1d4ed8 60%,#38bdf8 130%); border-radius:20px; padding:26px 30px; color:#fff; box-shadow:0 10px 30px rgba(30,64,175,.25);}
+.hero h1 {color:#fff; margin:0; font-size:2.1rem; line-height:1.2;} .hero p {color:#dbeafe; margin:8px 0 14px 0; font-size:1.02rem;}
+.chip {display:inline-block; background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.28); color:#fff; padding:3px 12px; border-radius:999px; font-size:.78rem; margin:0 6px 4px 0;}
+/* cards */
+.row {display:flex; flex-wrap:wrap; gap:14px; margin:16px 0;}
+.card {flex:1 1 190px; background:#fff; border-radius:16px; padding:16px 18px; box-shadow:0 2px 12px rgba(15,42,92,.08); border:1px solid #e6ecf7;}
+.kpi {flex:1 1 135px; padding:14px 14px; border-top:4px solid var(--c);} .kpi .top {display:flex; justify-content:space-between; align-items:center;}
+.kpi .l {color:#6b7280; font-size:.7rem; font-weight:600; text-transform:uppercase; letter-spacing:.2px; overflow-wrap:normal; word-break:normal; hyphens:none; font-kerning:none; font-feature-settings:"kern" 0;} .kpi .i {font-size:1.25rem; flex:0 0 auto; margin-left:6px;}
+.kpi .v {font-size:1.6rem; font-weight:800; color:#0f2a5c; line-height:1.25; margin-top:4px;} .kpi .s {color:#6b7280; font-size:.78rem;}
+.info {flex:1 1 280px;} .info h4 {margin:0 0 6px 0; color:#1e3a8a;} .info p {margin:0; color:#374151; font-size:.92rem; line-height:1.5;}
+.scard {flex:1 1 30%; min-width:240px;} .scard .hd {display:flex; align-items:center; gap:12px;} .scard .nm {font-weight:700; color:#0f2a5c;}
+.scard .pc {font-size:1.6rem; font-weight:800; margin:8px 0 2px 0;} .scard .ft {display:flex; justify-content:space-between; align-items:center; color:#6b7280; font-size:.78rem;} .scard .ft span {white-space:nowrap;}
+.badge {display:inline-flex; align-items:center; justify-content:center; border-radius:50%; color:#fff; font-weight:800; flex:0 0 auto;}
+.takeaway {background:#eff6ff; border-left:4px solid #2563eb; padding:8px 14px; border-radius:8px; color:#1e3a8a; font-size:.93rem; margin:4px 0 18px 0;}
+.subtitle {color:#4b5563; font-size:1.05rem; margin-top:-8px; margin-bottom:14px;}
+.pill {display:inline-block; padding:2px 10px; border-radius:999px; font-size:.8rem; font-weight:600;}
 .pill-buy {background:#dcfce7; color:#166534;} .pill-sell {background:#fee2e2; color:#991b1b;}
+[data-testid="stPlotlyChart"], [data-testid="stDataFrame"] {background:#fff; border-radius:14px; box-shadow:0 2px 12px rgba(15,42,92,.07); padding:6px;}
 footer {visibility:hidden;}
 </style>
 """
+
+TICKER = {"Bajaj Auto": "BAJ", "Eicher Motors": "EIC", "Hero Motocorp": "HER", "Infosys": "INF", "TCS": "TCS", "TVS Motors": "TVS"}
+_HERE = Path(__file__).resolve().parent
+_LOGO_DIRS = [_HERE.parent / "assets" / "logos", _HERE / "assets" / "logos"]   # project root or app/ folder
+
+
+@lru_cache(maxsize=None)
+def _logo_src(stock: str):
+    """Data-URI of your logo file (e.g. tcs.png; any letter case) from assets/logos, else None."""
+    slug = stock.lower().replace(" ", "_")
+    mimes = {".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".svg": "image/svg+xml"}
+    for d in _LOGO_DIRS:
+        if d.exists():
+            for f in sorted(d.iterdir()):
+                if f.name.lower().startswith(slug + ".") and f.suffix.lower() in mimes:
+                    return f"data:{mimes[f.suffix.lower()]};base64," + base64.b64encode(f.read_bytes()).decode()
+    return None
+
+
+def badge(stock: str, size: int = 42) -> str:
+    """Logo box from assets/logos if present (wide wordmarks fit), otherwise a coloured ticker badge."""
+    src = _logo_src(stock)
+    if src:
+        return (f'<img src="{src}" style="height:{size}px;width:{int(size * 1.9)}px;object-fit:contain;flex:0 0 auto;'
+                f'border-radius:10px;background:#fff;padding:4px;border:1px solid #e5e7eb">')
+    return (f'<span class="badge" style="width:{size}px;height:{size}px;background:{STOCK_COLORS[stock]};'
+            f'font-size:{size * 0.3:.0f}px">{TICKER[stock]}</span>')
+
+
+def kpi_row(items):
+    """items: (label, value, sub, icon, colour). Renders a responsive row of KPI cards."""
+    cards = "".join(
+        f'<div class="card kpi" style="--c:{c}"><div class="top"><span class="l">{l}</span><span class="i">{i}</span></div>'
+        f'<div class="v">{v}</div><div class="s">{s}</div></div>' for l, v, s, i, c in items)
+    st.markdown(f'<div class="row">{cards}</div>', unsafe_allow_html=True)
+
+
+def hero(title: str, subtitle: str, chips):
+    chips_html = "".join(f'<span class="chip">{c}</span>' for c in chips)
+    st.markdown(f'<div class="hero"><h1>{title}</h1><p>{subtitle}</p>{chips_html}</div>', unsafe_allow_html=True)
+
+
+def info_cards(items):
+    """items: (emoji + title, text)."""
+    html = "".join(f'<div class="card info"><h4>{t}</h4><p>{p}</p></div>' for t, p in items)
+    st.markdown(f'<div class="row">{html}</div>', unsafe_allow_html=True)
+
+
+def stock_cards(rows):
+    """rows: dicts with stock, change, sig, sig_date, buys, sells."""
+    html = ""
+    for r in rows:
+        col = GOOD if r["change"] >= 0 else BAD
+        html += (f'<div class="card scard"><div class="hd">{badge(r["stock"])}<div><div class="nm">{r["stock"]}</div>'
+                 f'<div class="s" style="color:#6b7280;font-size:.78rem">{r["buys"]} Buys · {r["sells"]} Sells</div></div></div>'
+                 f'<div class="pc" style="color:{col}">{pct(r["change"])}</div>'
+                 f'<div class="ft"><span>Total change</span><span>{signal_pill(r["sig"])} {r["sig_date"]}</span></div></div>')
+    st.markdown(f'<div class="row">{html}</div>', unsafe_allow_html=True)
 
 
 def setup(title: str, icon: str = "📈"):
@@ -37,8 +117,9 @@ def setup(title: str, icon: str = "📈"):
         st.caption("Six NSE stocks · Jan 2015 – Jul 2018 · MySQL on Aiven")
 
 
-def header(title: str, subtitle: str = ""):
-    st.title(title)
+def header(title: str, subtitle: str = "", stock: str = ""):
+    logo = f'<span style="margin-right:12px;vertical-align:middle">{badge(stock, 46)}</span>' if stock else ""
+    st.markdown(f'<h1 style="margin-bottom:0">{logo}{title}</h1>', unsafe_allow_html=True)
     if subtitle:
         st.markdown(f'<div class="subtitle">{subtitle}</div>', unsafe_allow_html=True)
 
