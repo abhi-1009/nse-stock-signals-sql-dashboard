@@ -24,9 +24,9 @@ Live app: https://nse-stock-signals-sql-dashboard-jkxkfdhnxtbrswkl6beakt.streaml
 <td><img src="screenshots/home1.png" alt="Overview page"></td>
 <td><img src="screenshots/home2.png" alt="Overview page"></td>
 <td><img src="screenshots/home3.png" alt="Overview page"></td>
-<td><img src="screenshots/price_signals.png" alt="Price and signals page"></td>
 </tr>
 <tr>
+<td><img src="screenshots/price_signals.png" alt="Price and signals page"></td>
 <td><img src="screenshots/data_trap.png" alt="Data trap page"></td>
 <td><img src="screenshots/strategy.png" alt="Strategy vs buy-and-hold page"></td>
 </tr>
