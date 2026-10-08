@@ -90,7 +90,8 @@ st.markdown(
     "instructors for their guidance and feedback. Thanks also to the **National Stock Exchange of India** "
     "(public corporate-action circular) and **Business Standard / PTI**, whose published reports confirmed the "
     "bonus-issue dates; to **Aiven** (cloud MySQL) and **Streamlit** (app hosting); and to the open-source tools "
-    "behind this work - MySQL, Python, pandas, SQLAlchemy, Plotly and Matplotlib.")
+    "behind this work - MySQL, Python, pandas, SQLAlchemy, Plotly and Matplotlib."
+    "Company logos shown here are trademarks of their respective owners and are used for identification only.")
 
 st.markdown(
     """
