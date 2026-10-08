@@ -1,6 +1,8 @@
 <div align="center">
 
-# 📈 Do moving-average signals deserve our trust?
+# 📈 SQL – Stock Market Analysis
+
+## Do moving-average signals deserve our trust?
 
 ### Golden-cross Buy/Sell analysis of six NSE stocks (2015–2018) in SQL, with a data-quality twist
 
@@ -14,8 +16,6 @@
 **[🚀 Open the live dashboard](https://nse-stock-signals-sql-dashboard-jkxkfdhnxtbrswkl6beakt.streamlit.app)**
 
 Live app: https://nse-stock-signals-sql-dashboard-jkxkfdhnxtbrswkl6beakt.streamlit.app
-
-**Insights report:** [Insights_Report.pdf](insights/Insights_Report.pdf)
 
 </div>
 
@@ -96,7 +96,7 @@ sql/        00_load_data · 01_explore (tasks 1-4 + audit) · 02_moving_averages
             03_signals (7-9) · 04_all_stocks (10) · 05_data_trap_and_fix (11-13)
             06_dashboard_tables (adjusted prices + signals) · 07_strategy_evaluation (extra)
 scripts/    load_csvs.py · build_tables.py · validate_checkpoints.py · audit_data.py
-app/        Home.py · pages/ (6 dashboard pages) · db.py · theme.py · queries.py
+app/        Home.py · pages/ (7 dashboard pages) · db.py · theme.py · queries.py
 data/       the six source CSVs
 insights/   missing_values.csv and the insights PDF
 certs/      ca.pem (public Aiven CA certificate)
@@ -112,8 +112,9 @@ screenshots/  images used in this README
 | **Compare Stocks** | All six side by side, raw vs adjusted, signal counts |
 | **Data Trap** | The two price cliffs, the fix, and which signals it changed |
 | **Strategy vs Buy-and-Hold** | Did following the signals pay off? Stability across periods, trade log |
+| **Recommendations** | What-if calculator (your amount, stock, investor type, cost) and recommendations with reasoning chains by investor type |
 | **SQL Playground** | Run every task's query, or your own read-only `SELECT` |
-| **Insights & Limits** | Claims, evidence, caveats, limitations, next steps |
+| **Insights & Limits** | Claims, evidence, caveats, named biases, limitations, next steps, acknowledgement |
 
 ## 📊 Data
 

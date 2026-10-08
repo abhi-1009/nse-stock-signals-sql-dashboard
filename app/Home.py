@@ -26,6 +26,15 @@ theme.kpi_row([
     ("Best performer", theme.pct(best["pct_change_adj"]), f"{best['stock']} · adjusted", "🚀", theme.GOOD),
     ("Weakest performer", theme.pct(worst["pct_change_adj"]), f"{worst['stock']} · adjusted", "🐢", theme.BAD)])
 
+# ---- visible assumptions, limits and biases ----
+theme.notice("⚠️ Read this first: assumptions, limits and biases", [
+    "<b>Selection / survivorship bias:</b> six hand-picked large companies (4 autos, 2 IT) that survived and did well; not the whole market.",
+    "<b>One market phase, in-sample:</b> 3.5 years that were mostly rising; every result is measured on the same data it was built on.",
+    "<b>Execution (look-ahead) bias:</b> trades are assumed at the same-day close the signal is computed on, which flatters the strategy.",
+    "<b>Small samples:</b> only 6–12 trades per stock, so differences between stocks may be chance.",
+    "<b>Left out:</b> brokerage, taxes, dividends and news; only two bonus issues were found and adjusted.",
+    "Recommendations are <b>ideas to test</b>, not investment advice."])
+
 # ---- problem / objective / decision ----
 theme.info_cards([
     ("🎯 The problem", "Retail investors follow a <i>golden cross</i> (20-day average crossing the 50-day average) "

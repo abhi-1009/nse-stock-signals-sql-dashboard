@@ -56,13 +56,16 @@ st.markdown(
     "- **What is missing?** Dividends, brokerage and taxes, news, market-wide moves, volume/liquidity limits, "
     "and any out-of-sample test.")
 
-st.subheader("Limitations")
+st.subheader("Limitations and biases")
 st.markdown(
-    "- **Sampling:** six hand-picked large companies (four autos, two IT), one 3.5-year period - not the market.\n"
+    "- **Selection / survivorship bias:** six hand-picked large companies (four autos, two IT) that survived and did well; not the whole market.\n"
+    "- **One market phase, in-sample:** 3.5 years that were mostly rising, and every result is measured on the data it was built on.\n"
+    "- **Execution (look-ahead) bias:** trades are assumed at the same-day close the signal is computed on, which flatters the strategy.\n"
+    "- **Small samples:** 6-12 trades per stock, so differences between stocks may be chance; no significance test was possible.\n"
     "- **Causality:** everything here is association over history; nothing shows a signal *causes* a return.\n"
-    "- **Data:** source, licence and collection method are not stated in the files; only close prices are used; "
-    "corporate-action dates were inferred and need verification.\n"
-    "- **Sample size:** 6-12 trades per stock is too few for firm conclusions.")
+    "- **Left out:** brokerage, taxes, dividends and news; only two bonus issues were found and adjusted.\n"
+    "- **Data provenance:** source, licence and collection method are not stated in the files.\n"
+    "- **Recommendations are ideas to test**, not investment advice.")
 
 st.subheader("If new data arrives")
 st.markdown("Later data may contain new splits/bonus issues (for example, further corporate actions after July 2018). "
@@ -90,8 +93,8 @@ st.markdown(
     "instructors for their guidance and feedback. Thanks also to the **National Stock Exchange of India** "
     "(public corporate-action circular) and **Business Standard / PTI**, whose published reports confirmed the "
     "bonus-issue dates; to **Aiven** (cloud MySQL) and **Streamlit** (app hosting); and to the open-source tools "
-    "behind this work - MySQL, Python, pandas, SQLAlchemy, Plotly and Matplotlib."
-    "Company logos shown here are trademarks of their respective owners and are used for identification only.")
+    "behind this work - MySQL, Python, pandas, SQLAlchemy, Plotly and Matplotlib. Company logos shown here are trademarks of their respective owners and "
+    "are used for identification only.")
 
 st.markdown(
     """

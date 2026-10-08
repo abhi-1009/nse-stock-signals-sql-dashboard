@@ -45,6 +45,15 @@ h1,h2,h3 {color:#0f2a5c; letter-spacing:-0.4px;} h1 {font-weight:800;}
 .pill {display:inline-block; padding:2px 10px; border-radius:999px; font-size:.8rem; font-weight:600;}
 .pill-buy {background:#dcfce7; color:#166534;} .pill-sell {background:#fee2e2; color:#991b1b;}
 [data-testid="stPlotlyChart"], [data-testid="stDataFrame"] {background:#fff; border-radius:14px; box-shadow:0 2px 12px rgba(15,42,92,.07); padding:6px;}
+.eyebrow {letter-spacing:1.6px; font-size:.74rem; font-weight:700; color:#93c5fd; margin-bottom:6px;}
+.eyebrow-l {letter-spacing:1.4px; font-size:.72rem; font-weight:700; color:#2563eb; margin-bottom:2px;}
+.notice {background:#fffbeb; border:1px solid #fcd34d; border-left:5px solid #f59e0b; border-radius:14px; padding:14px 20px; margin:16px 0;}
+.notice h4 {margin:0 0 6px 0; color:#92400e;} .notice ul {margin:0; padding-left:18px; color:#78350f; font-size:.9rem; line-height:1.55;}
+.rec {background:#fff; border-radius:16px; border:1px solid #e6ecf7; border-top:5px solid var(--c); padding:16px 20px; margin:12px 0; box-shadow:0 2px 12px rgba(15,42,92,.08);}
+.rec h4 {margin:0 0 8px 0; color:#0f2a5c;} .rec .tag {float:right; background:#eff6ff; color:#1e3a8a; border-radius:999px; padding:2px 10px; font-size:.75rem; font-weight:600;}
+.rec .chain {display:flex; flex-wrap:wrap; gap:10px; margin:8px 0;} .rec .step {flex:1 1 200px; background:#f8fafc; border-radius:10px; padding:10px 12px; font-size:.86rem; color:#374151; line-height:1.45;}
+.rec .step b {display:block; color:#1e3a8a; font-size:.74rem; text-transform:uppercase; letter-spacing:.5px; margin-bottom:3px;}
+.rec .meta {color:#6b7280; font-size:.8rem; margin-top:6px;}
 footer {visibility:hidden;}
 </style>
 """
@@ -85,9 +94,9 @@ def kpi_row(items):
     st.markdown(f'<div class="row">{cards}</div>', unsafe_allow_html=True)
 
 
-def hero(title: str, subtitle: str, chips):
+def hero(title: str, subtitle: str, chips, eyebrow: str = "SQL – STOCK MARKET ANALYSIS"):
     chips_html = "".join(f'<span class="chip">{c}</span>' for c in chips)
-    st.markdown(f'<div class="hero"><h1>{title}</h1><p>{subtitle}</p>{chips_html}</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="hero"><div class="eyebrow">{eyebrow}</div><h1>{title}</h1><p>{subtitle}</p>{chips_html}</div>', unsafe_allow_html=True)
 
 
 def info_cards(items):
@@ -110,16 +119,16 @@ def stock_cards(rows):
 
 def setup(title: str, icon: str = "📈"):
     """Must be the first Streamlit call on every page."""
-    st.set_page_config(page_title=f"{title} | Stock Signals", page_icon=icon, layout="wide")
+    st.set_page_config(page_title=f"{title} | SQL Stock Market Analysis", page_icon=icon, layout="wide")
     st.markdown(_CSS, unsafe_allow_html=True)
     with st.sidebar:
-        st.markdown("### 📈 Stock Signals")
+        st.markdown("### 📈 SQL – Stock Market Analysis")
         st.caption("Six NSE stocks · Jan 2015 – Jul 2018 · MySQL on Aiven")
 
 
 def header(title: str, subtitle: str = "", stock: str = ""):
     logo = f'<span style="margin-right:12px;vertical-align:middle">{badge(stock, 46)}</span>' if stock else ""
-    st.markdown(f'<h1 style="margin-bottom:0">{logo}{title}</h1>', unsafe_allow_html=True)
+    st.markdown(f'<div class="eyebrow-l">SQL – STOCK MARKET ANALYSIS</div><h1 style="margin:0">{logo}{title}</h1>', unsafe_allow_html=True)
     if subtitle:
         st.markdown(f'<div class="subtitle">{subtitle}</div>', unsafe_allow_html=True)
 
@@ -148,6 +157,14 @@ def style_fig(fig, title: str = "", ytitle: str = "", xtitle: str = "", height: 
     return fig
 
 
+def inr0(x) -> str:
+    """Whole rupees with Indian digit grouping, e.g. ₹1,00,000."""
+    s = str(int(round(abs(x)))); head, tail = s[:-3], s[-3:]
+    if head:
+        s = ",".join([head[max(i - 2, 0):i] for i in range(len(head), 0, -2)][::-1]) + "," + tail
+    return ("-" if x < 0 else "") + "₹" + s
+
+
 def inr(x) -> str:
     return f"₹{x:,.2f}"
 
@@ -160,3 +177,17 @@ def signal_pill(sig: str) -> str:
     cls = "pill-buy" if sig == "Buy" else "pill-sell"
     arrow = "▲" if sig == "Buy" else "▼"
     return f'<span class="pill {cls}">{arrow} {sig}</span>'
+
+
+def notice(title: str, items):
+    """A visible (never collapsed) box for assumptions, limits and biases."""
+    li = "".join(f"<li>{i}</li>" for i in items)
+    st.markdown(f'<div class="notice"><h4>{title}</h4><ul>{li}</ul></div>', unsafe_allow_html=True)
+
+
+def rec_card(who: str, title: str, finding: str, why: str, action: str, measure: str, meta: str, color: str):
+    """One recommendation with its reasoning chain: finding -> why it matters -> action -> how measured."""
+    steps = "".join(f'<div class="step"><b>{h}</b>{b}</div>' for h, b in
+                    (("1 · Finding", finding), ("2 · Why it matters", why), ("3 · Action", action), ("4 · How to measure", measure)))
+    st.markdown(f'<div class="rec" style="--c:{color}"><span class="tag">{who}</span><h4>{title}</h4>'
+                f'<div class="chain">{steps}</div><div class="meta">{meta}</div></div>', unsafe_allow_html=True)
