@@ -5,6 +5,7 @@ local testing only, the DATABASE_URL environment variable.
 """
 import os
 import re
+from decimal import Decimal
 from pathlib import Path
 
 import pandas as pd
@@ -166,4 +167,13 @@ def run_readonly(sql: str, limit: int = 1000) -> tuple[pd.DataFrame, bool]:
     finally:
         raw.close()
     truncated = len(rows) > limit
-    return pd.DataFrame(rows[:limit], columns=cols), truncated
+    return _decimals_to_float(pd.DataFrame(rows[:limit], columns=cols)), truncated
+
+
+def _decimals_to_float(df: pd.DataFrame) -> pd.DataFrame:
+    """MySQL DECIMAL columns arrive as Python Decimal (object dtype); make them numeric so charts work."""
+    for c in df.columns:
+        col = df[c]
+        if col.dtype == object and col.notna().any() and col.dropna().map(lambda v: isinstance(v, Decimal)).all():
+            df[c] = col.astype(float)
+    return df
